@@ -1,0 +1,25 @@
+---
+version: '3.3'
+
+services:
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql
+      - MYSQL_DATABASE=dbase
+    ports:
+      - "3307:3306"
+    volumes:
+      - my-db:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+# Names our volume
+volumes:
+  my-db:
