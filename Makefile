@@ -33,3 +33,7 @@ docker-build:
 .PHONY: docker-run
 docker-run:
 	docker run  --network=host --restart=always -d webservice
+
+.PHONY: swag-gen
+swag-gen:
+	swag init

@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/art-injener/otus/internal/service"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/art-injener/otus/internal"
 	"github.com/art-injener/otus/internal/config"
+	"github.com/art-injener/otus/internal/rest/swagger"
 )
 
-func CreateWebServer(cfg *config.Config) (*http.Server, error) {
+func CreateWebServer(service service.SocialNetworkService, cfg *config.Config) (*http.Server, error) {
 	if cfg == nil {
 		return nil, internal.ErrorEmptyConfig
 	}
@@ -21,7 +24,8 @@ func CreateWebServer(cfg *config.Config) (*http.Server, error) {
 	}
 
 	gin.SetMode(mode)
-	router := gin.New()
+	//TODO: при использовании gin.Default() внутри вызывается gin.New() и устанавливаются handlers gin.Logger() и gin.Recovery()
+	router := gin.Default()
 
 	router.Use(LoggerMiddleware())
 	router.Use(AuthMiddleware())
@@ -30,13 +34,15 @@ func CreateWebServer(cfg *config.Config) (*http.Server, error) {
 		c.AbortWithStatusJSON(http.StatusNotFound, errors.New("запрос не поддерживается"))
 	})
 
-	registerRoutes(router)
+	swagger.RegisterHandler(router)
+	registerAccountsRoutes(router, service, cfg)
 
 	return &http.Server{Addr: fmt.Sprintf(":%d", cfg.ServerPort), Handler: router}, nil
 }
 
-func registerRoutes(g *gin.Engine) {
-	g.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "Hello world")
-	})
+func registerAccountsRoutes(router *gin.Engine, service service.SocialNetworkService, cfg *config.Config) {
+	h := router.Group("/v1")
+	{
+		newAccountsRoutes(h, service, cfg.Log)
+	}
 }

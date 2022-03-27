@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/art-injener/otus/internal/repository/mock"
+	"github.com/art-injener/otus/internal/service"
 	"log"
 	"net/http"
 	"os"
@@ -29,7 +31,9 @@ func main() {
 	mainCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	httpServer, err := rest.CreateWebServer(cfg)
+	r := repository.NewAccountsRepo()
+	s := service.NewUserService(r, cfg.Log)
+	httpServer, err := rest.CreateWebServer(s, cfg)
 	if err != nil {
 		log.Println(err.Error())
 
