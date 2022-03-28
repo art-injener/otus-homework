@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/spf13/viper"
 
-	"github.com/art-injener/otus/internal/logger"
+	"github.com/art-injener/otus-homework/internal/logger"
 )
 
 const DebugLevel = "debug"
@@ -12,6 +12,7 @@ type Config struct {
 	LogLevel   string `mapstructure:"LOG_LEVEL"`
 	ServerPort int    `mapstructure:"PORT"`
 	UseMocks   bool   `mapstructure:"USE_MOCK"`
+	SessionKey string `mapstructure:"SESSION_KEY"`
 	DBConfig
 	Log *logger.Logger
 }

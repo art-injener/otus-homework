@@ -1,10 +1,10 @@
 package models
 
-type UserOption func(account *Account)
+type AccountOption func(account *Account)
 
 type Account struct {
-	ID      uint64 `json:"-"`
-	LoginID uint64 `json:"-"`
+	ID      int    `json:"-"`
+	LoginID int    `json:"-"`
 	Name    string `json:"name"`
 	Surname string `json:"surname"`
 	Age     int    `json:"age"`
@@ -15,16 +15,12 @@ type Account struct {
 
 func newDefaultAccount() *Account {
 	return &Account{
-		Name:    "",
-		Surname: "",
-		Age:     18,
-		Sex:     "male",
-		Hobby:   "",
-		City:    "",
+		Age: 0,
+		Sex: "m",
 	}
 }
 
-func NewAccount(options ...UserOption) *Account {
+func NewAccount(options ...AccountOption) *Account {
 	user := newDefaultAccount()
 
 	for _, userOption := range options {
