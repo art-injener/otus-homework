@@ -1,8 +1,9 @@
 package useroption
 
 import (
-	"github.com/art-injener/otus/internal/models"
 	"log"
+
+	"github.com/art-injener/otus-homework/internal/models"
 )
 
 func WithName(name string) models.UserOption {

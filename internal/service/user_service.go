@@ -2,32 +2,80 @@ package service
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/art-injener/otus/internal/logger"
-	"github.com/art-injener/otus/internal/models"
-	"github.com/art-injener/otus/internal/repository"
+	"github.com/art-injener/otus-homework/internal/logger"
+	"github.com/art-injener/otus-homework/internal/models"
+	"github.com/art-injener/otus-homework/internal/models/request"
+	"github.com/art-injener/otus-homework/internal/repository"
 )
 
-type UserService struct {
+type user struct {
 	repository repository.AccountsRepository
 	log        *logger.Logger
 }
 
-func NewUserService(repository repository.AccountsRepository, log *logger.Logger) *UserService {
-	return &UserService{
+func NewUserService(repository repository.AccountsRepository, log *logger.Logger) *user {
+	return &user{
 		repository: repository,
 		log:        log,
 	}
 }
 
-func (s *UserService) GetAll(ctx context.Context) ([]models.Account, error) {
-	return s.repository.GetAll()
+func (s *user) GetAllAccounts(ctx context.Context) ([]*models.Account, error) {
+	accounts, err := s.repository.GetAllAccounts()
+	if err != nil {
+		logger.LogError(fmt.Errorf(errGetAllAccounts.Error(), err), s.log)
+		return nil, errGetAllAccounts
+	}
+	return accounts, nil
 }
 
-func (s *UserService) GetById(ctx context.Context, id uint64) (models.Account, error) {
-	return s.repository.GetById(uint64(id))
+func (s *user) GetAccountById(ctx context.Context, id int) (*models.Account, error) {
+	account, err := s.repository.GetAccountByID(id)
+	if err != nil {
+		logger.LogError(fmt.Errorf(errGetAccountByID.Error(), err), s.log)
+		return nil, errGetAccountByID
+	}
+	return account, nil
 }
 
-func (s *UserService) Add(ctx context.Context, user models.Account) error {
-	return s.repository.Add(user)
+func (s *user) AddNewAccount(ctx context.Context, user *models.Account) error {
+	err := s.repository.AddAccount(user)
+	if err != nil {
+		logger.LogError(fmt.Errorf(errAddNewAccount.Error(), err), s.log)
+		return errAddNewAccount
+	}
+	return nil
+}
+
+func (s *user) GetUserByEmail(ctx context.Context, email string) (*request.User, error) {
+	return s.repository.GetUserByEmail(email)
+}
+
+func (s *user) GetUserByID(ctx context.Context, id int) (*request.User, error) {
+	return s.repository.GetUserByID(id)
+}
+
+func (s *user) AddNewUser(ctx context.Context, user *request.User) error {
+	if err := user.Validate(); err != nil {
+		return err
+	}
+
+	if err := user.BeforeCreate(); err != nil {
+		return err
+	}
+	return s.repository.AddNewUser(user)
+}
+
+func (s *user) ExistsUser(ctx context.Context, user *request.User) (bool, error) {
+	userByEmail, err := s.GetUserByEmail(ctx, user.Email)
+	if err != nil {
+		return false, err
+	}
+
+	if userByEmail != nil {
+		return true, nil
+	}
+	return false, nil
 }

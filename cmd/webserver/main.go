@@ -2,19 +2,21 @@ package main
 
 import (
 	"context"
-	"github.com/art-injener/otus/internal/repository/mock"
-	"github.com/art-injener/otus/internal/service"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/gorilla/sessions"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/art-injener/otus/internal/config"
-	"github.com/art-injener/otus/internal/logger"
-	"github.com/art-injener/otus/internal/rest"
+	"github.com/art-injener/otus-homework/internal/service"
+
+	"github.com/art-injener/otus-homework/internal/config"
+	"github.com/art-injener/otus-homework/internal/logger"
+	"github.com/art-injener/otus-homework/internal/repository/mysql/accounts"
+	"github.com/art-injener/otus-homework/internal/rest"
 )
 
 func main() {
@@ -31,9 +33,10 @@ func main() {
 	mainCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	r := repository.NewAccountsRepo()
-	s := service.NewUserService(r, cfg.Log)
-	httpServer, err := rest.CreateWebServer(s, cfg)
+	repo := accounts.NewAccountsRepo()
+	serv := service.NewUserService(repo, cfg.Log)
+	session := sessions.NewCookieStore([]byte(cfg.SessionKey))
+	webServer, err := rest.NewWebServer(serv, session, cfg)
 	if err != nil {
 		log.Println(err.Error())
 
@@ -42,10 +45,10 @@ func main() {
 
 	g, gCtx := errgroup.WithContext(mainCtx)
 	g.Go(func() error {
-		err := httpServer.ListenAndServe()
+		err := webServer.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
 			cfg.Log.Error().Msg("Start REST-API-server failed")
-			_ = httpServer.Shutdown(mainCtx)
+			_ = webServer.Shutdown(mainCtx)
 
 			return err
 		}
@@ -55,11 +58,11 @@ func main() {
 	g.Go(func() error {
 		<-gCtx.Done()
 
-		return httpServer.Shutdown(context.Background())
+		return webServer.Shutdown(context.Background())
 	})
 
 	if err := g.Wait(); err != nil {
-		log.Printf("exit reason: %s \n", err)
+		log.Printf("exit reason: %serv \n", err)
 	}
 
 }

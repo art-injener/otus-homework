@@ -1,6 +1,6 @@
 linters-settings:
   gci:
-    local-prefixes: github.com/art-injener/otus
+    local-prefixes: github.com/art-injener/otus-homework
   dupl:
     threshold: 100
   errorlint:

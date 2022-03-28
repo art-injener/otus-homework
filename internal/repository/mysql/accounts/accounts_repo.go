@@ -1,24 +1,37 @@
-package repository
+package accounts
 
 import (
-	"github.com/art-injener/otus/internal/models"
+	"github.com/art-injener/otus-homework/internal/models"
+	"github.com/art-injener/otus-homework/internal/models/request"
 )
 
-type AccountsRepositoryImpl struct {
+type accountsRepositoryImpl struct {
 }
 
-func NewAccountsRepo() *AccountsRepositoryImpl {
-	return &AccountsRepositoryImpl{}
+func NewAccountsRepo() *accountsRepositoryImpl {
+	return &accountsRepositoryImpl{}
 }
 
-func (r *AccountsRepositoryImpl) GetAll() ([]models.Account, error) {
+func (r *accountsRepositoryImpl) GetAllAccounts() ([]*models.Account, error) {
 	return nil, nil
 }
 
-func (r *AccountsRepositoryImpl) GetById(id uint64) (models.Account, error) {
-	return models.Account{}, nil
+func (r *accountsRepositoryImpl) GetAccountByID(id int) (*models.Account, error) {
+	return &models.Account{}, nil
 }
 
-func (r *AccountsRepositoryImpl) Add(user models.Account) error {
+func (r *accountsRepositoryImpl) AddAccount(user *models.Account) error {
+	return nil
+}
+
+func (r *accountsRepositoryImpl) GetUserByEmail(email string) (*request.User, error) {
+	return nil, nil
+}
+
+func (r *accountsRepositoryImpl) GetUserByID(id int) (*request.User, error) {
+	return nil, nil
+}
+
+func (r *accountsRepositoryImpl) AddNewUser(*request.User) error {
 	return nil
 }
