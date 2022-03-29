@@ -28,15 +28,6 @@ func TestUserRequest_Validate(t *testing.T) {
 			isValid: true,
 		},
 		{
-			name: "invalid id",
-			test: func() *User {
-				user := TestUser(t)
-				user.ID = 0
-				return user
-			},
-			isValid: false,
-		},
-		{
 			name: "invalid email",
 			test: func() *User {
 				user := TestUser(t)
@@ -50,6 +41,15 @@ func TestUserRequest_Validate(t *testing.T) {
 			test: func() *User {
 				user := TestUser(t)
 				user.Password = "pas"
+				return user
+			},
+			isValid: false,
+		},
+		{
+			name: "invalid repeated password",
+			test: func() *User {
+				user := TestUser(t)
+				user.RepeatedPassword = "pas"
 				return user
 			},
 			isValid: false,

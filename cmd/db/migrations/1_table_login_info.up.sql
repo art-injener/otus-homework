@@ -5,3 +5,6 @@ CREATE TABLE `logins_info` (
                                PRIMARY KEY (`id`),
                                UNIQUE KEY `logins_info_id_uindex` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `logins_info` (email, password) VALUES ('Vova1@mail.ru', 'password');
+INSERT INTO `logins_info` (email, password) VALUES ('Petrov@mail.ru', 'password');

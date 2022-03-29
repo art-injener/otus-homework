@@ -17,9 +17,9 @@ func newAccountsRoutes(handler *gin.RouterGroup, service service.SocialNetworkSe
 	r := handlers.NewAccountsHandler(service, log)
 
 	h := handler.Group("/accounts")
+	h.GET("/all", r.GetAccounts)
 	h.Use(AuthMiddleware(service, session))
 	{
-		h.GET("/all", r.GetAccounts)
 		h.GET("/:id", r.GetAccountById)
 		h.POST("/new", r.AddAccount)
 	}

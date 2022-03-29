@@ -6,8 +6,14 @@ DB_NAME ?= dbase
 
 .PHONY: migrate_up
 migrate_up:
-	docker image build -t custom_migrate ./db
+	docker image build -t custom_migrate ./cmd/db
 	docker run --network host custom_migrate -path=/migrations/ -database "${DATABASE}://${CUR_USER}:${PASSWORD}@tcp(${HOST})/${DB_NAME}" up
+
+.PHONY: migrate_down
+migrate_down:
+	docker image build -t custom_migrate ./cmd/db
+	docker run --network host custom_migrate -path=/migrations/ -database "${DATABASE}://${CUR_USER}:${PASSWORD}@tcp(${HOST})/${DB_NAME}" down -all
+
 
 .PHONY: build
 build:
@@ -33,7 +39,3 @@ docker-build:
 .PHONY: docker-run
 docker-run:
 	docker run  --network=host --restart=always -d webservice
-
-.PHONY: swag-gen
-swag-gen:
-	swag init

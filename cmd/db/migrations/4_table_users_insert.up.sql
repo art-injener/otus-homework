@@ -1,0 +1,2 @@
+INSERT INTO users (login_id, name, surname, age, sex, hobby, city) values ('1', 'Ivan', 'Ivanov', '18', 'm', 'programming', 'Moscow'),
+                                                                          ('2', 'Petr', 'Petrov', '30', 'm', 'sport', 'Saratov');

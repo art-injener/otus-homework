@@ -11,6 +11,7 @@ type SocialNetworkService interface {
 	GetAllAccounts(context.Context) ([]*models.Account, error)
 	GetAccountById(context.Context, int) (*models.Account, error)
 	AddNewAccount(context.Context, *models.Account) error
+	GetAccountByUserID(context.Context, int) (*models.Account, error)
 
 	GetUserByEmail(context.Context, string) (*request.User, error)
 	GetUserByID(context.Context, int) (*request.User, error)

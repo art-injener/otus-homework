@@ -12,3 +12,5 @@ CREATE TABLE `users` (
                          KEY `users_logins_info_id_fk` (`login_id`),
                          CONSTRAINT `users_logins_info_id_fk` FOREIGN KEY (`login_id`) REFERENCES `logins_info` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='анкеты пользователей социальной сети';
+
+

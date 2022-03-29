@@ -22,6 +22,7 @@ func (c *Config) IsDebug() bool {
 }
 
 type DBConfig struct {
+	Type     string `mapstructure:"DB_TYPE"`
 	Host     string `mapstructure:"DB_HOST"`
 	Port     uint16 `mapstructure:"DB_PORT"`
 	NameDB   string `mapstructure:"DB_DATABASE"`
@@ -62,6 +63,10 @@ func LoadConfig(path string) (*Config, error) {
 	}
 
 	if err := viper.UnmarshalKey("DB_DATABASE", &cfg.DBConfig.NameDB); err != nil {
+		return nil, err
+	}
+
+	if err := viper.UnmarshalKey("DB_TYPE", &cfg.DBConfig.Type); err != nil {
 		return nil, err
 	}
 

@@ -6,7 +6,9 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
-	github.com/google/uuid v1.3.0
+	github.com/go-playground/validator/v10 v10.10.0 // indirect
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/sessions v1.2.1
 	github.com/rs/zerolog v1.26.1
 	github.com/spf13/viper v1.10.1

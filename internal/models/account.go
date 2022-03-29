@@ -3,20 +3,21 @@ package models
 type AccountOption func(account *Account)
 
 type Account struct {
-	ID      int    `json:"-"`
+	ID      int    `json:"id"`
 	LoginID int    `json:"-"`
-	Name    string `json:"name"`
-	Surname string `json:"surname"`
-	Age     int    `json:"age"`
-	Sex     string `json:"sex"`
-	Hobby   string `json:"hobby"`
-	City    string `json:"city"`
+	Avatar  string `json:"avatar"`
+	Name    string `json:"name" binding:"required"`
+	Surname string `json:"surname" binding:"required"`
+	Age     int    `json:"age" binding:"required"`
+	Sex     rune   `json:"sex" binding:"required,len=1"`
+	Hobby   string `json:"hobby" binding:"required"`
+	City    string `json:"city" binding:"required"`
 }
 
 func newDefaultAccount() *Account {
 	return &Account{
 		Age: 0,
-		Sex: "m",
+		Sex: 'm',
 	}
 }
 

@@ -1,6 +1,8 @@
 package mock
 
 import (
+	"context"
+
 	"github.com/art-injener/otus-homework/internal/models"
 	"github.com/art-injener/otus-homework/internal/models/request"
 	"github.com/art-injener/otus-homework/internal/repository"
@@ -11,6 +13,8 @@ type accountsRepositoryMock struct {
 	users    map[int]*request.User
 }
 
+var _ repository.AccountsRepository = &accountsRepositoryMock{}
+
 func NewAccountsRepo() *accountsRepositoryMock {
 	repo := accountsRepositoryMock{
 		accounts: make(map[int]*models.Account),
@@ -19,7 +23,7 @@ func NewAccountsRepo() *accountsRepositoryMock {
 	return &repo
 }
 
-func (r *accountsRepositoryMock) GetAllAccounts() ([]*models.Account, error) {
+func (r *accountsRepositoryMock) GetAllAccounts(context.Context) ([]*models.Account, error) {
 	users := make([]*models.Account, 0, len(r.accounts))
 	for _, account := range r.accounts {
 		users = append(users, account)
@@ -39,6 +43,15 @@ func (r *accountsRepositoryMock) AddAccount(user *models.Account) error {
 	user.ID = len(r.accounts)
 	r.accounts[len(r.accounts)] = user
 	return nil
+}
+
+func (r *accountsRepositoryMock) GetAccountByUserID(userID int) (*models.Account, error) {
+	for _, v := range r.accounts {
+		if v.LoginID == userID {
+			return v, nil
+		}
+	}
+	return nil, repository.ErrAccountNotFound
 }
 
 func (r *accountsRepositoryMock) GetUserByEmail(email string) (*request.User, error) {

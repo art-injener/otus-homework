@@ -1,14 +1,14 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/art-injener/otus-homework/internal/logger"
 	"github.com/art-injener/otus-homework/internal/models"
 	"github.com/art-injener/otus-homework/internal/service"
-	"github.com/gin-gonic/gin"
 )
 
 type accounts struct {
@@ -29,7 +29,11 @@ func (a *accounts) GetAccounts(ctx *gin.Context) {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
-	ctx.IndentedJSON(http.StatusOK, users)
+
+	ctx.HTML(http.StatusOK, "users_list.html",
+		gin.H{
+			"users": users,
+		})
 }
 
 func (a *accounts) GetAccountById(ctx *gin.Context) {
@@ -48,13 +52,16 @@ func (a *accounts) GetAccountById(ctx *gin.Context) {
 }
 
 func (a *accounts) AddAccount(ctx *gin.Context) {
-	var user *models.Account
-	if err := ctx.BindJSON(&user); err != nil {
+	account := models.Account{}
+	if err := ctx.BindJSON(&account); err != nil {
 		logger.LogError(err, a.log)
-		ErrorResponse(ctx, http.StatusBadRequest, fmt.Errorf("Получено некорректное сообщение", err))
+		ErrorResponse(ctx, http.StatusBadRequest, errIncorrectDataForNewAccount)
 		return
 	}
-	if err := a.service.AddNewAccount(ctx.Request.Context(), user); err != nil {
+	userId, _ := ctx.Get("auth_user_id")
+	account.LoginID = userId.(int)
+
+	if err := a.service.AddNewAccount(ctx.Request.Context(), &account); err != nil {
 		ErrorResponse(ctx, http.StatusInternalServerError, err)
 		return
 	}

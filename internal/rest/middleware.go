@@ -1,20 +1,18 @@
 package rest
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"github.com/gorilla/sessions"
 
 	"github.com/art-injener/otus-homework/internal/rest/handlers"
 	"github.com/art-injener/otus-homework/internal/service"
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/gorilla/sessions"
 )
 
 func LoggerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Println("!!")
 	}
 }
 
@@ -47,7 +45,7 @@ func AuthMiddleware(service service.SocialNetworkService, sessions sessions.Stor
 	return func(c *gin.Context) {
 		session, err := sessions.Get(c.Request, handlers.SessionName)
 		if err != nil {
-			handlers.ErrorResponse(c, http.StatusInternalServerError, err)
+			handlers.ErrorResponse(c, http.StatusInternalServerError, errors.New("Внутренняя ошибка сервера"))
 			return
 		}
 		id, ok := session.Values["user_id"]
@@ -56,11 +54,11 @@ func AuthMiddleware(service service.SocialNetworkService, sessions sessions.Stor
 			return
 		}
 
-		user, err := service.GetUserByID(c.Request.Context(), id.(int))
+		_, err = service.GetUserByID(c.Request.Context(), id.(int))
 		if err != nil {
 			handlers.ErrorResponse(c, http.StatusUnauthorized, ErrNotAuthenticated)
 			return
 		}
-		c.Set("auth_user", user)
+		c.Set("auth_user_id", id)
 	}
 }
