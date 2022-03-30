@@ -63,6 +63,10 @@ func (a *accounts) GetAccountByID(ctx *gin.Context) {
 		return
 	}
 
+	if account.Avatar == "" {
+		account.Avatar = defaultAvatar
+	}
+
 	friends, err := a.service.GetFriends(ctx.Request.Context(), account.ID)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, err)
