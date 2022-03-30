@@ -1,14 +1,14 @@
 package rest
 
 import (
-	"errors"
 	"net/http"
 
-	"github.com/art-injener/otus-homework/internal/rest/handlers"
-	"github.com/art-injener/otus-homework/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
+
+	"github.com/art-injener/otus-homework/internal/rest/handlers"
+	"github.com/art-injener/otus-homework/internal/service"
 )
 
 func LoggerMiddleware() gin.HandlerFunc {
@@ -34,31 +34,46 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET")
 
 		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
+			c.AbortWithStatus(http.StatusNoContent)
 
 			return
 		}
 	}
 }
 
-func AuthMiddleware(service service.SocialNetworkService, sessions sessions.Store) gin.HandlerFunc {
+func AuthMiddleware(svc service.SocialNetworkService, store sessions.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		session, err := sessions.Get(c.Request, handlers.SessionName)
+		session, err := store.Get(c.Request, handlers.SessionName)
 		if err != nil {
-			handlers.ErrorResponse(c, http.StatusInternalServerError, errors.New("Внутренняя ошибка сервера"))
+			handlers.ErrorResponse(c, http.StatusInternalServerError, errInternalServerError)
 			return
 		}
 		id, ok := session.Values["user_id"]
 		if !ok {
-			handlers.ErrorResponse(c, http.StatusUnauthorized, ErrNotAuthenticated)
+			handlers.ErrorResponse(c, http.StatusUnauthorized, errNotAuthenticated)
+
 			return
 		}
 
-		_, err = service.GetUserByID(c.Request.Context(), id.(int))
-		if err != nil {
-			handlers.ErrorResponse(c, http.StatusUnauthorized, ErrNotAuthenticated)
+		userId, ok := id.(int)
+		if !ok {
+			handlers.ErrorResponse(c, http.StatusUnauthorized, errNotAuthenticated)
 			return
 		}
+
+		_, err = svc.GetUserByID(c.Request.Context(), userId)
+		if err != nil {
+			handlers.ErrorResponse(c, http.StatusUnauthorized, errNotAuthenticated)
+			return
+		}
+
+		account, err := svc.GetAccountByUserID(c.Request.Context(), userId)
+		if err != nil {
+			handlers.ErrorResponse(c, http.StatusUnauthorized, errNotAuthenticated)
+			return
+		}
+
 		c.Set("auth_user_id", id)
+		c.Set("current_account", account)
 	}
 }

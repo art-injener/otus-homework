@@ -1,0 +1,33 @@
+{{template "layout_base.html" . }}
+{{template "header.html"}}
+
+<section id="cover" class="min-vh-100">
+  <div id="cover-caption">
+    <div class="container">
+      <div class="row text-white">
+        <div class="col-xl-5 col-lg-6 col-md-8 col-sm-10 mx-auto text-center form p-4">
+          {{if .error }}
+          <div style="background-color:red; color: #222222"> <b> {{ .error }}</b>
+          </div>
+          {{end}}
+          <div class="px-2">
+            <form method="POST" class="justify-content-center">
+              <h3 class="px-2" style="color: #222222">Введите почту и пароль</h3>
+              <h6 class="px-2" style="color: #222222">Чтобы защитить Ваши данные, придумайте надежный пароль. Минимальная длина пароля 6 символов</h6>
+              <div class="form-group">
+                <input type="text" name="email" class="form-control" placeholder="Почта">
+              </div>
+              <div class="form-group">
+                <input type="password" name="password" class="form-control" placeholder="Пароль">
+              </div>
+              <div class="form-group">
+                <input type="password" name="repeated_password" class="form-control" placeholder="Повторите пароль">
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm" href="/v1/registration">Зарегистрировать</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </div>
+</section>

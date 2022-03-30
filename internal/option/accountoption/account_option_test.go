@@ -1,4 +1,4 @@
-package option
+package accountoption
 
 import (
 	"testing"
@@ -15,38 +15,22 @@ func TestAccountOption(t *testing.T) {
 		test  func(value interface{}, account *models.Account) interface{}
 	}{
 		{
-			name:  "positive age",
-			valid: true,
-			value: 19,
-			test: func(value interface{}, account *models.Account) interface{} {
-				WithAge(value.(int))(account)
-				return account.Age
-			},
-		},
-		{
-			name:  "negative age",
-			valid: false,
-			value: -19,
-			test: func(value interface{}, account *models.Account) interface{} {
-				WithAge(value.(int))(account)
-				return account.Age
-			},
-		},
-		{
 			name:  "correct sex",
 			valid: true,
-			value: "male",
+			value: 'm',
 			test: func(value interface{}, account *models.Account) interface{} {
 				WithSex(value.(string))(account)
+
 				return account.Sex
 			},
 		},
 		{
 			name:  "incorrect sex",
 			valid: false,
-			value: "man",
+			value: 'v',
 			test: func(value interface{}, account *models.Account) interface{} {
 				WithSex(value.(string))(account)
+
 				return account.Sex
 			},
 		},

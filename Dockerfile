@@ -16,6 +16,8 @@ WORKDIR /root/
 
 COPY --from=0 /github.com/art-injener/otus-homework/bin/server .
 COPY --from=0 /github.com/art-injener/otus-homework/configs configs/
+COPY --from=0 /github.com/art-injener/otus-homework/templates templates/
+COPY --from=0 /github.com/art-injener/otus-homework/static static/
 
 RUN apk add --no-cache tzdata
 ENV TZ=Europe/Moscow

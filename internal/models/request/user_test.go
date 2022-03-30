@@ -11,7 +11,6 @@ func TestUser_BeforeCreate(t *testing.T) {
 
 	assert.NoError(t, user.BeforeCreate())
 	assert.NotEmpty(t, user.EncryptedPassword)
-
 }
 
 func TestUserRequest_Validate(t *testing.T) {
@@ -32,6 +31,7 @@ func TestUserRequest_Validate(t *testing.T) {
 			test: func() *User {
 				user := TestUser(t)
 				user.Email = "qwert"
+
 				return user
 			},
 			isValid: false,
@@ -41,6 +41,7 @@ func TestUserRequest_Validate(t *testing.T) {
 			test: func() *User {
 				user := TestUser(t)
 				user.Password = "pas"
+
 				return user
 			},
 			isValid: false,
@@ -49,7 +50,8 @@ func TestUserRequest_Validate(t *testing.T) {
 			name: "invalid repeated password",
 			test: func() *User {
 				user := TestUser(t)
-				user.RepeatedPassword = "pas"
+				user.RepeatedPassword = "pas1"
+
 				return user
 			},
 			isValid: false,

@@ -14,11 +14,17 @@ type User struct {
 	EncryptedPassword string `json:"-"`
 }
 
+const (
+	passwordMinLength = 6
+	passwordMaxLength = 100
+)
+
 func (u *User) Validate() error {
-	return validation.ValidateStruct(u,
+	return validation.ValidateStruct(
+		u,
 		validation.Field(&u.Email, validation.Required, is.Email),
-		validation.Field(&u.Password, validation.Required, validation.Length(6, 100)),
-		validation.Field(&u.RepeatedPassword, validation.Required, validation.Length(6, 100)))
+		validation.Field(&u.Password, validation.Required, validation.Length(passwordMinLength, passwordMaxLength)),
+		validation.Field(&u.RepeatedPassword, validation.Required, validation.Length(passwordMinLength, passwordMaxLength)))
 }
 
 func (u *User) BeforeCreate() error {
@@ -31,6 +37,7 @@ func (u *User) BeforeCreate() error {
 
 		u.EncryptedPassword = enc
 	}
+
 	return nil
 }
 
@@ -41,7 +48,7 @@ func (u *User) ComparePassword(password string) bool {
 func encryptString(password string) (string, error) {
 	b, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	return string(b), nil

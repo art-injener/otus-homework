@@ -8,20 +8,16 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/art-injener/otus-homework/internal/db/mysql"
-
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/sessions"
-
-	"github.com/art-injener/otus-homework/internal/service"
-
 	"golang.org/x/sync/errgroup"
 
 	"github.com/art-injener/otus-homework/internal/config"
+	"github.com/art-injener/otus-homework/internal/db/mysql"
 	"github.com/art-injener/otus-homework/internal/logger"
 	"github.com/art-injener/otus-homework/internal/repository/mysql/accounts"
 	"github.com/art-injener/otus-homework/internal/rest"
-
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/art-injener/otus-homework/internal/service"
 )
 
 func main() {
@@ -61,7 +57,7 @@ func main() {
 		err := webServer.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
 			cfg.Log.Error().Msg("Start REST-API-server failed")
-			_ = webServer.Shutdown(mainCtx)
+			err = webServer.Shutdown(mainCtx)
 
 			return err
 		}
@@ -71,7 +67,7 @@ func main() {
 	g.Go(func() error {
 		<-gCtx.Done()
 
-		return webServer.Shutdown(context.Background())
+		return webServer.Shutdown(mainCtx)
 	})
 
 	if err := g.Wait(); err != nil {

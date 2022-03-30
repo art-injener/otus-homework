@@ -13,23 +13,32 @@ import (
 	"github.com/art-injener/otus-homework/internal/service"
 )
 
-func newAccountsRoutes(handler *gin.RouterGroup, service service.SocialNetworkService, session sessions.Store, log *logger.Logger) {
-	r := handlers.NewAccountsHandler(service, log)
+func newAccountsRoutes(handler *gin.RouterGroup, srv service.SocialNetworkService, session sessions.Store, log *logger.Logger) {
+	r := handlers.NewAccountsHandler(srv, log)
 
 	h := handler.Group("/accounts")
-	h.GET("/all", r.GetAccounts)
-	h.Use(AuthMiddleware(service, session))
+	h.Use(AuthMiddleware(srv, session))
 	{
-		h.GET("/:id", r.GetAccountById)
+		h.GET("/all", r.GetAccounts)
+		h.GET("/:id", r.GetAccountByID)
 		h.POST("/new", r.AddAccount)
+		h.GET("/new", func(context *gin.Context) {
+			context.HTML(http.StatusOK, "new_account.html", nil)
+		})
+		h.GET("make-friend/:friend-id", r.MakeFriends)
 	}
 }
 
-func newUsersRoutes(handler *gin.RouterGroup, service service.SocialNetworkService, session sessions.Store, cfg *config.Config) {
-	usersHandler := handlers.NewUsersHandler(service, cfg.Log, session)
+func newUsersRoutes(handler *gin.RouterGroup, srv service.SocialNetworkService, session sessions.Store, cfg *config.Config) {
+	usersHandler := handlers.NewUsersHandler(srv, cfg.Log, session)
 
 	handler.POST("/registration", usersHandler.RegisterNewUser)
+	handler.GET("/registration", func(context *gin.Context) {
+		context.HTML(http.StatusOK, "new_user.html", nil)
+	})
 	handler.POST("/login", usersHandler.LoginUser)
+	handler.GET("/login", usersHandler.LoginForm)
+	handler.GET("/logout", usersHandler.Logout)
 }
 
 func HealthCheck(c *gin.Context) {

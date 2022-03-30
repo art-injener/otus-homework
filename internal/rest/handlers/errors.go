@@ -3,9 +3,8 @@ package handlers
 import "errors"
 
 var (
-	errIncorrectEmailOrPassword   = errors.New("Введенные логин или пароль некорректны")
-	errIncorrectDataForNewAccount = errors.New("Получены некорректные данные для добавления нового профиля")
-	errIncorrectDataLogin         = errors.New("Получены некорректные данные для аутентификации")
+	errIncorrectDataForNewAccount = errors.New("получены некорректные данные для добавления нового профиля")
+	errAccountIsExists            = errors.New("профиль для пользователя уже существует")
 
-	errIncorrectDataForNewUser = errors.New("Получены некорректные данные для добавления нового пользователя")
+	errInternalServerError = errors.New("внутренняя ошибка сервера")
 )

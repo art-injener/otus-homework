@@ -1,4 +1,4 @@
-package option
+package accountoption
 
 import (
 	"log"
@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	femaleTypeName = "female"
-	maleTypeName   = "male"
+	femaleTypeName = "f"
+	maleTypeName   = "m"
 )
 
 func WithName(name string) models.AccountOption {
@@ -23,20 +23,11 @@ func WithSurname(surname string) models.AccountOption {
 	}
 }
 
-func WithAge(age int) models.AccountOption {
-	return func(a *models.Account) {
-		if age < 0 {
-			log.Println("Возраст должен быть больше 0!")
-			return
-		}
-		a.Age = age
-	}
-}
-
 func WithSex(sex string) models.AccountOption {
 	return func(a *models.Account) {
 		if sex != maleTypeName && sex != femaleTypeName {
 			log.Println("Значение должно быть либо \"male\", либо \"female\"")
+
 			return
 		}
 		a.Sex = sex

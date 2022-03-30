@@ -12,7 +12,14 @@ const (
 )
 
 func NewConnection(cfg *config.Config) (conn *sql.DB, err error) {
-	dsn := fmt.Sprintf(dsnFormat, cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.NameDB)
+	dsn := fmt.Sprintf(
+		dsnFormat,
+		cfg.User,
+		cfg.Password,
+		cfg.Host,
+		cfg.Port,
+		cfg.NameDB,
+	)
 
 	db, err := sql.Open(cfg.Type, dsn)
 	if err != nil {

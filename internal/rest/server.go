@@ -12,7 +12,7 @@ import (
 	"github.com/art-injener/otus-homework/internal/service"
 )
 
-func NewWebServer(service service.SocialNetworkService, session sessions.Store, cfg *config.Config) (*http.Server, error) {
+func NewWebServer(svc service.SocialNetworkService, session sessions.Store, cfg *config.Config) (*http.Server, error) {
 	if cfg == nil {
 		return nil, internal.ErrorEmptyConfig
 	}
@@ -28,10 +28,10 @@ func NewWebServer(service service.SocialNetworkService, session sessions.Store, 
 	router.Use(LoggerMiddleware())
 	router.Use(CORSMiddleware())
 	router.NoRoute(func(c *gin.Context) {
-		c.AbortWithStatusJSON(http.StatusNotFound, ErrRequestNotSupported)
+		c.AbortWithStatusJSON(http.StatusNotFound, errRequestNotSupported)
 	})
 
-	registerRoutes(router, service, session, cfg)
+	registerRoutes(router, svc, session, cfg)
 
 	router.Static("/css", "./static/css")
 	router.Static("/js", "./static/js")
@@ -42,16 +42,19 @@ func NewWebServer(service service.SocialNetworkService, session sessions.Store, 
 	return &http.Server{Addr: fmt.Sprintf(":%d", cfg.ServerPort), Handler: router}, nil
 }
 
-func registerRoutes(router *gin.Engine, service service.SocialNetworkService, session sessions.Store, cfg *config.Config) {
+func registerRoutes(router *gin.Engine, svc service.SocialNetworkService, session sessions.Store, cfg *config.Config) {
 	routerGroup := router.Group("/v1")
 	{
-		newAccountsRoutes(routerGroup, service, session, cfg.Log)
-		newUsersRoutes(routerGroup, service, session, cfg)
+		newAccountsRoutes(routerGroup, svc, session, cfg.Log)
+		newUsersRoutes(routerGroup, svc, session, cfg)
 	}
 
-	router.GET("/", index)
-}
+	router.GET("/", func(ctx *gin.Context) {
+		currentAccount, _ := ctx.Get("current_account")
 
-func index(c *gin.Context) {
-	c.Redirect(http.StatusFound, "/v1/accounts/all")
+		ctx.HTML(http.StatusOK, "index.html",
+			gin.H{
+				"currentAccount": currentAccount,
+			})
+	})
 }

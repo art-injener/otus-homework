@@ -15,9 +15,9 @@ type user struct {
 	log        *logger.Logger
 }
 
-func NewUserService(repository repository.AccountsRepository, log *logger.Logger) *user {
+func NewUserService(repo repository.AccountsRepository, log *logger.Logger) *user {
 	return &user{
-		repository: repository,
+		repository: repo,
 		log:        log,
 	}
 }
@@ -26,17 +26,21 @@ func (s *user) GetAllAccounts(ctx context.Context) ([]*models.Account, error) {
 	accounts, err := s.repository.GetAllAccounts(ctx)
 	if err != nil {
 		logger.LogError(err, s.log)
+
 		return nil, errGetAllAccounts
 	}
+
 	return accounts, nil
 }
 
-func (s *user) GetAccountById(ctx context.Context, id int) (*models.Account, error) {
+func (s *user) GetAccountByID(ctx context.Context, id int) (*models.Account, error) {
 	account, err := s.repository.GetAccountByID(ctx, id)
 	if err != nil {
 		logger.LogError(err, s.log)
+
 		return nil, errGetAccount
 	}
+
 	return account, nil
 }
 
@@ -44,8 +48,10 @@ func (s *user) AddNewAccount(ctx context.Context, user *models.Account) error {
 	err := s.repository.AddAccount(ctx, user)
 	if err != nil {
 		logger.LogError(err, s.log)
+
 		return errAddNewAccount
 	}
+
 	return nil
 }
 
@@ -53,17 +59,45 @@ func (s *user) GetAccountByUserID(ctx context.Context, userID int) (*models.Acco
 	account, err := s.repository.GetAccountByUserID(ctx, userID)
 	if err != nil {
 		logger.LogError(err, s.log)
+
 		return nil, errGetAccount
 	}
+
 	return account, nil
+}
+
+func (s *user) UpdateAccount(ctx context.Context, acc *models.Account) error {
+	if err := acc.Validate(); err != nil {
+		logger.LogError(err, s.log)
+
+		return errValidationAccount
+	}
+
+	err := s.repository.UpdateAccount(ctx, acc)
+	if err != nil {
+		logger.LogError(err, s.log)
+
+		return errUpdateAccount
+	}
+
+	curAccount, err := s.GetAccountByUserID(ctx, acc.LoginID)
+	if err != nil {
+		logger.LogError(err, s.log)
+
+		return errUpdateAccount
+	}
+	acc.ID = curAccount.ID
+	return nil
 }
 
 func (s *user) GetUserByEmail(ctx context.Context, email string) (*request.User, error) {
 	user, err := s.repository.GetUserByEmail(ctx, email)
 	if err != nil {
 		logger.LogError(err, s.log)
+
 		return nil, errGetDataUser
 	}
+
 	return user, nil
 }
 
@@ -71,14 +105,17 @@ func (s *user) GetUserByID(ctx context.Context, id int) (*request.User, error) {
 	user, err := s.repository.GetUserByID(ctx, id)
 	if err != nil {
 		logger.LogError(err, s.log)
+
 		return nil, errGetDataUser
 	}
+
 	return user, nil
 }
 
 func (s *user) AddNewUser(ctx context.Context, user *request.User) error {
 	if err := user.Validate(); err != nil {
 		logger.LogError(err, s.log)
+
 		return errValidationUser
 	}
 
@@ -88,14 +125,17 @@ func (s *user) AddNewUser(ctx context.Context, user *request.User) error {
 
 	if err := user.BeforeCreate(); err != nil {
 		logger.LogError(err, s.log)
+
 		return errRegistrationNewUser
 	}
 
 	err := s.repository.AddNewUser(ctx, user)
 	if err != nil {
 		logger.LogError(err, s.log)
+
 		return errRegistrationNewUser
 	}
+
 	return nil
 }
 
@@ -110,5 +150,28 @@ func (s *user) ExistsUser(ctx context.Context, user *request.User) (bool, error)
 	if userByEmail != nil {
 		return true, nil
 	}
+
 	return false, nil
+}
+
+func (s *user) MakeFriends(ctx context.Context, currentAccountID, friendID int) error {
+	err := s.repository.MakeFriends(ctx, currentAccountID, friendID)
+	if err != nil {
+		logger.LogError(err, s.log)
+
+		return errMakeFriends
+	}
+
+	return nil
+}
+
+func (s *user) GetFriends(ctx context.Context, accountID int) (accounts []*models.Account, err error) {
+	friends, err := s.repository.GetFriends(ctx, accountID)
+	if err != nil {
+		logger.LogError(err, s.log)
+
+		return nil, errGetFriends
+	}
+
+	return friends, nil
 }

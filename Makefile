@@ -39,3 +39,4 @@ docker-build:
 .PHONY: docker-run
 docker-run:
 	docker run  --network=host --restart=always -d webservice
+
